@@ -277,7 +277,7 @@
 
         const token = data[0].patient_id;
 
-        const audio = new Audio("resources/ding.wav");
+        const audio = new Audio("/resources/ding.wav");
         audio.play();
 
         form.reset();
@@ -331,35 +331,74 @@
         const timeString = `${displayHours}:${displayMinutes}${ampm}`;
 
         console.log("🕒 Formatted time string:", timeString);
-        resultDiv.innerHTML = `✅<br>Booked: ${token}<br>Estimated time: ${timeString}`;
-        resultDiv.className = "success fade-in";
+
 // 5️⃣ Insert into sms_queue
-        if(phone === "0700000000") {
-            console.log("⏭️ Skipping SMS for placeholder number.");
-            phoneNumber = "";
-            phoneDisplay.textContent = "07XXXXXXXX";
-            return;
-        }
-        const message =
-            `Dear patient,\n` +
-            `Your token number: ${token}\n` +
-            `Estimated consultation time: ${timeString}`;
-        console.log("WEBVIEWCOM:"+phone+":"+message);
-        console.log("📨 SMS message:", message);
 
-        const {error: smsErr} = await supabaseClient
-            .from("sms_queue")
-            .insert([{phone: phone, message: message}]);
-
-        if (smsErr) {
-            console.error("❌ Error adding to sms_queue:", smsErr);
-        } else {
-            console.log("✅ SMS queued successfully for phone:", phone);
-        }
-        phoneNumber = "";
-        phoneDisplay.textContent = "07XXXXXXXX";
 
     });
+
+
+
+    async function getPredictionForNextToken(phone) {
+        const {data, error} = await supabaseClient
+            .from("patients")
+            .insert([{phone: phone, status: "waiting"}])
+            .select("patient_id");
+
+
+        if (error) {
+            console.error(error);
+
+            return;
+        }
+
+        const token = parseInt(data[0].patient_id)+1;
+        console.log("🔍 Requesting prediction for token:", token);
+
+        const {data: prediction, error: predictErr} = await supabaseClient
+            .rpc("predict_token_wait", {target_token: token});
+
+        if (predictErr || !prediction || prediction.length === 0) {
+            console.error("❌ Prediction error:", predictErr);
+            console.log("📭 Prediction response:", prediction);
+            return;
+        }
+
+        console.log("✅ Prediction result:", prediction[0]);
+
+// 2️⃣ Parse estimated_wait interval
+        const intervalString = prediction[0].estimated_wait; // e.g., "00:05:00"
+        console.log("⏱️ Raw interval string:", intervalString);
+
+        let estimatedMinutes = 5; // fallback
+        if (typeof intervalString === 'string' && intervalString.includes(':')) {
+            const parts = intervalString.split(':'); // ["hh", "mm", "ss"]
+            const hours = parseInt(parts[0]);
+            const minutes = parseInt(parts[1]);
+            estimatedMinutes = (hours * 60) + minutes;
+        } else {
+            console.warn("⚠️ Unexpected interval format:", intervalString);
+        }
+
+        console.log("🧮 Estimated wait time (minutes):", estimatedMinutes);
+
+// 3️⃣ Calculate estimated call time
+        const estimatedCallTime = new Date(Date.now() + estimatedMinutes * 60000);
+        console.log("📅 Estimated call time:", estimatedCallTime.toString());
+
+// 4️⃣ Format as hh:mmAM/PM
+        const hours = estimatedCallTime.getHours();
+        const minutes = estimatedCallTime.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const displayHours = ((hours + 11) % 12 + 1);
+        const displayMinutes = minutes.toString().padStart(2, '0');
+        const timeString = `${displayHours}:${displayMinutes}${ampm}`;
+
+        console.log("🕒 Formatted time string:", timeString);
+        console.log(`WEBVIEWCOM:${phone}:Now ongoing token: ${token}\n` +
+            `Estimated time:${timeString}\n` +
+            `Thanks for using /stat\n`);
+    }
 
 </script>
 </body>
