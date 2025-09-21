@@ -1,0 +1,58 @@
+<button onclick="startDialing()">📞 Dial 0718440518</button>
+
+<script>
+  const dtmfFrequencies = {
+    '1': [697, 1209],
+    '2': [697, 1336],
+    '3': [697, 1477],
+    '4': [770, 1209],
+    '5': [770, 1336],
+    '6': [770, 1477],
+    '7': [852, 1209],
+    '8': [852, 1336],
+    '9': [852, 1477],
+    '0': [941, 1336]
+  };
+
+  const numberToDial = "0718445576";
+  let index = 0;
+  let dialInterval;
+
+  function playDTMF(digit) {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const [f1, f2] = dtmfFrequencies[digit];
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc1.frequency.value = f1;
+    osc2.frequency.value = f2;
+    osc1.type = 'sine';
+    osc2.type = 'sine';
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc1.start();
+    osc2.start();
+    osc1.stop(ctx.currentTime + 0.2);
+    osc2.stop(ctx.currentTime + 0.2);
+  }
+
+  function startDialing() {
+    index = 0;
+    clearInterval(dialInterval);
+    dialInterval = setInterval(() => {
+      if (index < numberToDial.length) {
+        const digit = numberToDial[index];
+        if (dtmfFrequencies[digit]) {
+          playDTMF(digit);
+        }
+        index++;
+      } else {
+        clearInterval(dialInterval);
+      }
+    }, 300); // 300ms between tones
+  }
+</script>
