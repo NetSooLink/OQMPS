@@ -12,14 +12,14 @@
             display: flex;
             justify-content: center;
             align-items: center;
-          background:black;
+            background: black;
         }
 
         body::before {
             content: "";
             position: fixed;
             inset: 0;
-            background:black;
+            background: black;
 
             backdrop-filter: blur(8px);
             z-index: 0;
@@ -342,7 +342,8 @@
         const message =
             `Dear patient,\n` +
             `Your token number: ${token}\n` +
-            `Estimated consultation time: ${timeString}`;
+            `Estimated consultation time: ${timeString}\n` +
+            `After service feedback: https://bit.ly/4nKElKA\n`;
         console.log("WEBVIEWCOM:" + phone + ":" + message);
         console.log("📨 SMS message:", message);
 
