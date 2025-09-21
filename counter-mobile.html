@@ -344,7 +344,7 @@
             `Dear patient,\n` +
             `Your token number: ${token}\n` +
             `Estimated consultation time: ${timeString}`;
-
+        console.log("WEBVIEWCOM:"+phone+":"+message);
         console.log("📨 SMS message:", message);
 
         const {error: smsErr} = await supabaseClient
