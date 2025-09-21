@@ -52,6 +52,7 @@
             border: 2px solid #b2dfdb;
             border-radius: 8px;
             background: #e0f2f1;
+
         }
 
         .keyboard-grid {
@@ -85,6 +86,10 @@
         .error {
             color: #c62828;
         }
+        .number {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
     </style>
 </head>
 <body>
@@ -93,8 +98,8 @@
     <h1>OPD Counter</h1>
     <form id="registerForm" autocomplete="off">
         <div id="nextToken" class="next-token">Next Token: --</div>
-        <input type="hidden" id="phone" name="phone"/>
-        <div id="phoneDisplay" class="next-token">07XXXXXXXX</div>
+        <input type="hidden" id="phone" name="phone" class="number"/>
+        <div id="phoneDisplay" class="next-token number">07XXXXXXXX</div>
 
         <div class="keyboard-grid">
             <button type="button" class="key">1</button>
@@ -343,7 +348,7 @@
             `Dear patient,\n` +
             `Your token number: ${token}\n` +
             `Estimated consultation time: ${timeString}\n` +
-            `After service feedback: https://bit.ly/4nKElKA\n`;
+            `After service feedback: https://netsoolink.github.io/OQMPS/feedback-form.html?uuid=${generateRandomString(10)}\n`;
         console.log("WEBVIEWCOM:" + phone + ":" + message);
         console.log("📨 SMS message:", message);
 
@@ -422,7 +427,14 @@
             `Estimated time:${timeString}\n` +
             `Thanks for using /stat\n`);
     }
-
+    function generateRandomString(length) {
+        const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
 </script>
 </body>
 </html>
