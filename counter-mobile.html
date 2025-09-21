@@ -13,6 +13,7 @@
             justify-content: center;
             align-items: center;
             background: url('https://images.unsplash.com/photo-1586773860418-d37222d8fce3') no-repeat center center/cover;
+
         }
 
         body::before {
@@ -27,7 +28,7 @@
         .container {
             position: relative;
             z-index: 1;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(0, 0, 0, 0.95);
             padding: 30px 40px;
             border-radius: 12px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
@@ -39,7 +40,7 @@
         h1 {
             margin-bottom: 15px;
             font-size: 1.8rem;
-            color: #00695c;
+            color: #00ffe0;
         }
 
         .next-token {
@@ -139,13 +140,12 @@
                     resultDiv.textContent = "Invalid number";
                     resultDiv.className = "error";
                 }
-            } else if( val === "SKIP") {
+            } else if (val === "SKIP") {
                 phoneNumber = "0700000000";
                 phoneInput.value = phoneNumber;
                 form.dispatchEvent(new Event("submit", {bubbles: true, cancelable: true}));
 
-            }
-            else {
+            } else {
                 if (phoneNumber.length < 10) {
                     phoneNumber += val;
                     playDTMF(val);
@@ -192,7 +192,6 @@
         osc1.stop(ctx.currentTime + 0.15);
         osc2.stop(ctx.currentTime + 0.15);
     }
-
 
 
 </script>
@@ -331,12 +330,35 @@
         const timeString = `${displayHours}:${displayMinutes}${ampm}`;
 
         console.log("🕒 Formatted time string:", timeString);
-
+        resultDiv.innerHTML = `✅<br>Booked: ${token}<br>Estimated time: ${timeString}`;
+        resultDiv.className = "success fade-in";
 // 5️⃣ Insert into sms_queue
+        if (phone === "0700000000") {
+            console.log("⏭️ Skipping SMS for placeholder number.");
+            phoneNumber = "";
+            phoneDisplay.textContent = "07XXXXXXXX";
+            return;
+        }
+        const message =
+            `Dear patient,\n` +
+            `Your token number: ${token}\n` +
+            `Estimated consultation time: ${timeString}`;
+        console.log("WEBVIEWCOM:" + phone + ":" + message);
+        console.log("📨 SMS message:", message);
 
+        const {error: smsErr} = await supabaseClient
+            .from("sms_queue")
+            .insert([{phone: phone, message: message}]);
+
+        if (smsErr) {
+            console.error("❌ Error adding to sms_queue:", smsErr);
+        } else {
+            console.log("✅ SMS queued successfully for phone:", phone);
+        }
+        phoneNumber = "";
+        phoneDisplay.textContent = "07XXXXXXXX";
 
     });
-
 
 
     async function getPredictionForNextToken(phone) {
@@ -352,7 +374,7 @@
             return;
         }
 
-        const token = parseInt(data[0].patient_id)+1;
+        const token = parseInt(data[0].patient_id) + 1;
         console.log("🔍 Requesting prediction for token:", token);
 
         const {data: prediction, error: predictErr} = await supabaseClient
