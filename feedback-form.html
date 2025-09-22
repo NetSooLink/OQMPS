@@ -105,7 +105,7 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const uuid = urlParams.get('uuid');
-
+    console.log(uuid);
     const formContainer = document.getElementById('formContainer');
     const blockedMessage = document.getElementById('blockedMessage');
 
@@ -118,7 +118,7 @@
             e.preventDefault();
 
             const data = {
-                uuid: parseInt(uuid),
+                uuid: uuid,
                 q1: form.q1.value,
                 q2: form.q2.value,
                 q3: form.q3.value,
