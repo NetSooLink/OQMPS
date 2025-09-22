@@ -111,6 +111,7 @@
         <div id="nextToken" class="next-token">Next Token: --</div>
         <input type="hidden" id="phone" name="phone" class="number"/>
         <div id="phoneDisplay" class="next-token number">07XXXXXXXX</div>
+        <audio id="tone" src="resources/ding.wav" preload="auto"></audio>
 
         <div class="keyboard-grid">
             <button type="button" class="key">1</button>
@@ -151,6 +152,7 @@
             } else if (val === "✔") {
                 if (/^07\d{8}$/.test(phoneNumber)) {
                     phoneInput.value = phoneNumber;
+
                     form.dispatchEvent(new Event("submit", {bubbles: true, cancelable: true}));
                 } else {
                     resultDiv.textContent = "Invalid number";
@@ -159,6 +161,7 @@
             } else if (val === "SKIP") {
                 phoneNumber = "0700000000";
                 phoneInput.value = phoneNumber;
+
                 form.dispatchEvent(new Event("submit", {bubbles: true, cancelable: true}));
 
             } else {
@@ -215,7 +218,27 @@
         osc2.stop(ctx.currentTime + 0.15);
     }
 
+    function playConfirmationTone() {
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.25, ctx.currentTime);
+        gain.connect(ctx.destination);
 
+        // "Buu" tone (low frequency)
+        const buu = ctx.createOscillator();
+        buu.type = 'sine';
+        buu.frequency.setValueAtTime(440, ctx.currentTime); // A4
+        buu.connect(gain);
+        buu.start(ctx.currentTime);
+        buu.stop(ctx.currentTime + 0.4);
+
+        // "Beee" tone (higher frequency), starts after "buu"
+        const beee = ctx.createOscillator();
+        beee.type = 'sine';
+        beee.frequency.setValueAtTime(880, ctx.currentTime + 0.2); // A5
+        beee.connect(gain);
+        beee.start(ctx.currentTime + 0.5);
+        beee.stop(ctx.currentTime + 1);
+    }
 </script>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -298,8 +321,7 @@
 
         const token = data[0].patient_id;
 
-        const audio = new Audio("/resources/ding.wav");
-        audio.play();
+        document.getElementById("tone").play();
 
         form.reset();
         phoneInput.focus();
