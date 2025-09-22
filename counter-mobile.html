@@ -147,7 +147,7 @@
         btn.addEventListener("click", () => {
             const val = btn.textContent;
 
-            if (val === "←") {
+            if (val === "X") {
                 phoneNumber = phoneNumber.slice(0, -1);
             } else if (val === "✔") {
                 if (/^07\d{8}$/.test(phoneNumber)) {
