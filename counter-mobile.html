@@ -86,6 +86,7 @@
         .error {
             color: #c62828;
         }
+
         .number {
             font-family: 'Courier New', monospace;
             letter-spacing: 2px;
@@ -344,23 +345,15 @@
             phoneDisplay.textContent = "07XXXXXXXX";
             return;
         }
-        const message =
+        const message1 =
             `Dear patient,\n` +
             `Your token number: ${token}\n` +
             `Estimated consultation time: ${timeString}\n`;
-            //`After service feedback: https://netsoolink.github.io/OQMPS/feedback-form.html?uuid=${generateRandomString(10)}\n`;
-        console.log("WEBVIEWCOM:" + phone + ":" + message);
-        console.log("📨 SMS message:", message);
+           console.log("WEBVIEWCOM:" + phone + ":" + message1);
+        const message2 = `After service feedback: https://netsoolink.github.io/OQMPS/feedback-form.html?uuid=${generateRandomString(10)}\n`;
+        console.log("WEBVIEWCOM:" + phone + ":" + message2);
 
-        const {error: smsErr} = await supabaseClient
-            .from("sms_queue")
-            .insert([{phone: phone, message: message}]);
 
-        if (smsErr) {
-            console.error("❌ Error adding to sms_queue:", smsErr);
-        } else {
-            console.log("✅ SMS queued successfully for phone:", phone);
-        }
         phoneNumber = "";
         phoneDisplay.textContent = "07XXXXXXXX";
 
@@ -427,6 +420,7 @@
             `Estimated time:${timeString}\n` +
             `Thanks for using /stat\n`);
     }
+
     function generateRandomString(length) {
         const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
         let result = '';
