@@ -174,9 +174,10 @@
         '9': [852, 1477],
         '0': [941, 1336]
     };
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playDTMF(digit) {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
         const [f1, f2] = dtmfFrequencies[digit];
         const osc1 = ctx.createOscillator();
         const osc2 = ctx.createOscillator();
@@ -187,7 +188,8 @@
         osc1.type = 'sine';
         osc2.type = 'sine';
 
-        gain.gain.setValueAtTime(0.25, ctx.currentTime); // 🔉 reduce volume here
+        gain.gain.cancelScheduledValues(ctx.currentTime);
+        gain.gain.setValueAtTime(0.25, ctx.currentTime);
 
         osc1.connect(gain);
         osc2.connect(gain);
