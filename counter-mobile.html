@@ -99,7 +99,9 @@
             font-family: 'Courier New', monospace;
             letter-spacing: 2px;
         }
-
+        .skip-button {
+            grid-column: span 3; /* spans across 3 columns */
+        }
 
     </style>
 </head>
@@ -127,7 +129,7 @@
             <button type="button" class="key">0</button>
 
             <button type="button" class="key" id="submit"><span style="color:#7dff00">✔</span></button>
-            <button type="button" class="key"><span style="color:#ff8f00">SKIP</span></button>
+            <button type="button" class="key skip-button"><span style="color:#ff8f00">SKIP</span></button>
         </div>
 
         <button type="submit" id="registerBtn" style="display: none">Register</button>
