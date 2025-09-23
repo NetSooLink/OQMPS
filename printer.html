@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Debug Thermal Printer</title>
+</head>
+<body>
+  <h2>Debug GA-E200I Thermal Printer</h2>
+  <button onclick="listDevices()">List Approved Devices</button>
+  <button onclick="requestPermission()">Request Permission</button>
+  <button onclick="printHello()">Print 'Hello'</button>
+
+  <pre id="log" style="background:#eee; padding:10px;"></pre>
+
+  <script>
+    let printerDevice = null;
+    const log = document.getElementById("log");
+
+    function logMessage(msg) {
+      console.log(msg);
+      log.textContent += msg + "\n";
+    }
+
+    async function listDevices() {
+      try {
+        const devices = await navigator.usb.getDevices();
+        if (devices.length === 0) {
+          logMessage("No approved USB devices found.");
+        } else {
+          devices.forEach((device, i) => {
+            logMessage(`Device ${i + 1}: VID=${device.vendorId.toString(16)}, PID=${device.productId.toString(16)}`);
+          });
+        }
+      } catch (err) {
+        logMessage("Error listing devices: " + err.message);
+      }
+    }
+
+    async function requestPermission() {
+      try {
+        printerDevice = await navigator.usb.requestDevice({
+          filters: [{ vendorId: 0x0471, productId: 0x0055 }]
+        });
+        logMessage("Permission granted for device: VID=0x0471, PID=0x0055");
+      } catch (err) {
+        logMessage("Permission denied: " + err.message);
+      }
+    }
+
+    async function printHello() {
+      if (!printerDevice) {
+        logMessage("Printer not connected. Please request permission first.");
+        return;
+      }
+
+      try {
+        logMessage("Opening device...");
+        await printerDevice.open();
+
+        logMessage("Selecting configuration...");
+        await printerDevice.selectConfiguration(1);
+
+        logMessage("Claiming interface...");
+        await printerDevice.claimInterface(0); // Try 1 or 2 if 0 fails
+
+        logMessage("Sending ESC/POS data...");
+        const encoder = new TextEncoder();
+        const escpos = encoder.encode("Hello\n\x1D\x56\x00"); // Text + cut
+        await printerDevice.transferOut(1, escpos); // Try endpoint 2 if 1 fails
+
+        logMessage("Print command sent successfully!");
+      } catch (err) {
+        logMessage("Print failed: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
