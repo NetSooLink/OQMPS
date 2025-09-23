@@ -425,11 +425,12 @@
         }
         const message1 =
             `Dear patient,\n` +
-            `Your token number: ${token}\n` +
-            `Estimated consultation time: ${timeString}\n`;
+            `Your token: #${token}\n` +
+            `ETA: ${timeString}\n`+
+            `After service feedback: https://netsoolink.github.io/OQMPS/feedback-form.html?uuid=${generateRandomString(10)}`;
            console.log("WEBVIEWCOM:" + phone + ":" + message1);
-       //  const message2 = `After service feedback: https://netsoolink.github.io/OQMPS/feedback-form.html?uuid=${generateRandomString(10)}\n`;
-       // console.log("WEBVIEWCOM:" + phone + ":" + message2);
+         
+        console.log("WEBVIEWCOM:" + phone + ":" + message2);
         const year = estimatedCallTime.getFullYear();
         const month = (estimatedCallTime.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based
         const day = estimatedCallTime.getDate().toString().padStart(2, '0');
