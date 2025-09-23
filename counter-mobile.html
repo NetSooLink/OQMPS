@@ -429,8 +429,8 @@
             `ETA: ${timeString}\n`+
             `After service feedback: https://netsoolink.github.io/OQMPS/feedback-form.html?uuid=${generateRandomString(10)}`;
            console.log("WEBVIEWCOM:" + phone + ":" + message1);
-         
-        console.log("WEBVIEWCOM:" + phone + ":" + message2);
+
+       
         const year = estimatedCallTime.getFullYear();
         const month = (estimatedCallTime.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based
         const day = estimatedCallTime.getDate().toString().padStart(2, '0');
